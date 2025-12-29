@@ -1,5 +1,8 @@
+# ビルド引数としてDIFY_API_VERSIONを受け取る
+ARG DIFY_API_VERSION=latest
+
 # ベースイメージとしてDocker Hubからイメージをプル
-FROM langgenius/dify-api:latest
+FROM langgenius/dify-api:${DIFY_API_VERSION}
 
 # カスタムのentrypoint.shを追加
 COPY entrypoint.sh /custom-entrypoint.sh
