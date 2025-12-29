@@ -37,6 +37,10 @@ resource "google_cloud_run_v2_service" "dify_service" {
   template {
     service_account       = google_service_account.dify_service_account.email
     execution_environment = "EXECUTION_ENVIRONMENT_GEN2"
+
+    annotations = {
+      "run.googleapis.com/cpu-throttling" = "false"
+    }
     containers {
       name  = "nginx"
       image = "${var.region}-docker.pkg.dev/${var.project_id}/${var.nginx_repository_id}/dify-nginx:latest"
@@ -191,9 +195,10 @@ resource "google_cloud_run_v2_service" "dify_service" {
         value = 2
       }
       # NOTE: Changing PM2_HOME is required for pm2 to work properly on Cloud Run Gen2 environment because of permission issues
+      # 上のコメントが曖昧すぎるが、要するにCloud RunのGen2ではvalueを変えてくれということ。
       env {
         name  = "PM2_HOME"
-        value = "/app/web/.pm2"
+        value = "/tmp/.pm2"
       }
       env {
         name  = "LOOP_NODE_MAX_COUNT"
@@ -356,16 +361,6 @@ resource "google_cloud_run_v2_service" "dify_service" {
           name  = env.key
           value = env.value
         }
-      }
-      startup_probe {
-        http_get {
-          path = "/"
-          port = 5000
-        }
-        initial_delay_seconds = 10
-        timeout_seconds       = 240
-        period_seconds        = 240
-        failure_threshold     = 1
       }
     }
     vpc_access {

@@ -33,6 +33,7 @@ locals {
     "INDEXING_MAX_SEGMENTATION_TOKENS_LENGTH"    = var.indexing_max_segmentation_tokens_length
     "PLUGIN_DAEMON_KEY"                          = var.plugin_daemon_key
     "PLUGIN_DIFY_INNER_API_KEY"                  = var.plugin_dify_inner_api_key
+    "SERVER_WORKER_CLASS"                        = "gthread"
   }
 }
 
@@ -109,6 +110,12 @@ module "storage" {
   depends_on = [google_project_service.enabled_services]
 }
 
+resource "google_storage_bucket_iam_member" "dify_service_storage_admin" {
+  bucket = module.storage.storage_bucket_name
+  role   = "roles/storage.admin"
+  member = "serviceAccount:${module.cloudrun.dify_service_account_email}"
+}
+
 module "filestore" {
   source = "../../modules/filestore"
 
@@ -142,6 +149,7 @@ locals {
     "vpcaccess.googleapis.com",
     "run.googleapis.com",
     "storage.googleapis.com",
+    "file.googleapis.com",
   ]
 }
 
