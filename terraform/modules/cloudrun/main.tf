@@ -275,7 +275,7 @@ resource "google_cloud_run_v2_service" "dify_service" {
       }
       env {
         name  = "PLUGIN_WORKING_PATH"
-        value = "/app/storage/cwd"
+        value = "/tmp/dify-cwd"
       }
       env {
         name  = "FORCE_VERIFYING_SIGNATURE"
@@ -301,10 +301,10 @@ resource "google_cloud_run_v2_service" "dify_service" {
           port = 5003
         }
       }
-      volume_mounts {
-        name       = "plugin-daemon"
-        mount_path = "/app/storage"
-      }
+      # volume_mounts {
+      #   name       = "plugin-daemon"
+      #   mount_path = "/app/storage"
+      # }
     }
     containers {
       name  = "dify-worker"
