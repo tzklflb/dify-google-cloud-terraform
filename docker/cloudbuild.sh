@@ -1,15 +1,13 @@
 #!/bin/bash
 
-PROJECT_ID=$1
-REGION=$2
+PROJECT_ID=${1:-"tzklflb-ai"}
+REGION=${2:-"asia-northeast1"}
 DIFY_API_VERSION=${3:-"latest"}
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Nginx Build and Push
-pushd docker/nginx
-gcloud builds submit --config=cloudbuild.yaml --substitutions=_REGION=$REGION,_PROJECT_ID=$PROJECT_ID
-popd
+bash "${SCRIPT_DIR}/build-nginx.sh" "${PROJECT_ID}" "${REGION}"
 
 # API Build and Push
-pushd docker/api
-gcloud builds submit --config=cloudbuild.yaml --substitutions=_REGION=$REGION,_PROJECT_ID=$PROJECT_ID,_DIFY_API_VERSION=$DIFY_API_VERSION
-popd
+bash "${SCRIPT_DIR}/build-api.sh" "${PROJECT_ID}" "${REGION}" "${DIFY_API_VERSION}"
